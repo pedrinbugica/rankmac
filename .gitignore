@@ -1,0 +1,16 @@
+# Cópia de teste do servidor (mundo, jogadores, senhas) - nunca subir
+.teste/
+# O servidor tem repositório próprio (serverrank)
+ServidorRankup/
+# Gerados / grandes
+.build/jdk/
+.build/apidump/
+.build/classes/
+.build/classes-npc/
+.build/classes-rpg/
+.build/tools/bin/
+.build/bot/node_modules/
+.build/*.jar
+.build/*.out
+.build/*.txt
+.build/*.log

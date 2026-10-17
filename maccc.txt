@@ -1,0 +1,191 @@
+Construa um servidor de minecragt do 0 com plugins de rankup, quero um servidor bom de rankup com tudo em portugues, crie a pasta e tudo, nao cometa erros e deixe tudo muito foda !
+
+Tudo confirmado. Agora um teste de regressão com o Paper novo + PacketEvents + /premium ativo, garantindo que a entrada de jogadores continua perfeita:
+
+Executou 2 comandos
+Login e /premium estão funcionando como esperado. Agora vou testar a reconexão para garantir que um jogador pirata que digitar /premium por engano não fique trancado para fora.
+
+Verified pirate player can log in after trying premium
+Seguro: a verificação falha, ele avisa e o jogador pirata entra normalmente com a senha. Vejo se há qualquer outro aviso no log antes de limpar:
+
+Executou 2 comandos
+O único aviso restante é o cache interno de perfis do WorldGuard, inofensivo, que vou citar no LEIA-ME. Agora vou desligar o servidor, limpar todos os dados dos jogadores de teste (contas AuthMe, saldos, progresso, logs) e desativar o RCON usado nos testes.
+
+Executou 1 comando, finalizou 1 comando em segundo plano
+Vou limpar todos os dados de teste criados pelos bots e apagar o banco do LuckPerms, deixando o plugin recriar os grupos automaticamente na próxima inicialização — isso também servirá como novo teste da configuração automática.
+
+Delete all test player data and reset LuckPerms Falhou
+O verificador de segurança bloqueou o rm com glob relativo após cd (precaução correta). Refaço com caminhos absolutos e explícitos, sem curingas:
+
+Executou 4 comandos
+Agora a inicialização final de verificação (com o estado limpo, como você vai receber):
+
+Executou 2 comandos, editou LEIA-ME.txt
+Grupos recriados (7 entradas) e 18 hologramas gerados sem avisos inesperados, mas percebi que o LuckPerms rejeita comandos simultâneos do mesmo remetente. Vou verificar se algum dos 88 comandos automáticos foi recusado por esse motivo.
+
+Counted executed vs expected LuckPerms setup commands
+Conferência exata: 58 permissões + 6 grupos × (criação, peso, nome, herança, prefixo) = 88 comandos, 0 recusados. Desligo o servidor, desativo o RCON de testes e removo os logs:
+
+Executou 2 comandos, finalizou 1 comando em segundo plano
+A pasta está limpa (512 MB, 180 MB sendo do Java embutido). Agora vou rodar o próprio INICIAR.bat como teste final, religando o RCON temporariamente para confirmar que o script funciona.
+
+Executou 2 comandos (1 falha), finalizou 1 comando em segundo plano
+O lançamento pelo .bat terminou com código 1. Vou ver o que aconteceu:
+
+Read INICIAR.bat test output
+O cmd não achou o arquivo por causa de um caminho relativo específico do meu ambiente de teste via Git Bash. Vou cancelar a chamada pendente e testar novamente usando o caminho completo via PowerShell, simulando um duplo clique.
+
+Executou 2 comandos, usou 2 ferramentas
+O INICIAR.bat funciona: mostra o banner, usa o Java 25 embutido e carrega o Paper 26.3. Aguardo terminar de ligar e desligo com stop:
+
+Waited for startup then stopped via RCON and checked bat ending
+Testei o INICIAR.bat completo: liga em ~18s e desliga limpo, sem erros. Agora vou desligar o RCON, apagar os logs do teste e remover a pasta de build temporária.
+
+Executou 3 comandos
+O servidor está pronto na pasta ServidorRankup. Para ligar, é só dar dois cliques em INICIAR.bat e entrar no Minecraft pelo IP localhost. O Java 25 já vem dentro da pasta, então você não precisa instalar nada.
+
+O que tem nele
+Paper 26.3 (a versão mais nova do Minecraft). Com o ViaVersion e o ViaBackwards, entram clientes da 1.10 até a 26.3.
+Modo original + pirata. Os jogadores criam a conta com /registrar e entram com /logar. Quem tem Minecraft original pode usar /premium para entrar sem senha.
+Um plugin de rankup que eu escrevi do zero (RankupSupremo), todo em português:
+Ranks e minas: 15 ranks (de Mendigo até Lenda) e 15 minas, uma por rank, construídas sozinhas no primeiro início. As minas resetam sozinhas.
+Spawn: uma ilha flutuante com um sinalizador dourado.
+Mineração e venda: os blocos vão direto para o inventário, /vender vende tudo e /autovender vende enquanto você minera.
+Picareta: melhorias de Eficiência, Fortuna e Explosão compradas por menu.
+Prestígio: reinicia o rank e dá bônus permanente de venda, até o nível 100.
+Visual: scoreboard, TAB, chat com tags, hologramas e menus.
+Grupos já configurados no LuckPerms: VIP, MVP, Ajudante, Moderador, Admin e Dono, com tags e permissões.
+Plugins de apoio: EssentialsX em pt_BR (economia, homes, tpa), AuthMe em português, ícone e descrição (MOTD) próprios, e um LEIA-ME.txt explicando tudo.
+Primeira coisa a fazer: entre no servidor, use /registrar SENHA SENHA e depois digite no console lp user SEU_NICK parent set dono. Como o servidor aceita piratas, registre o nick de toda a staff antes de divulgar.
+
+Como eu testei
+Liguei o servidor várias vezes e usei bots que jogaram de verdade (cliente 1.21.11 entrando pelo ViaBackwards). Tudo isto funcionou:
+
+registrar e logar;
+proteção do spawn e minas bloqueadas por rank;
+minerar e vender;
+/rankup pelo comando e pelo menu;
+comprar melhorias da picareta (a Explosão funcionou);
+autovenda e o aviso de inventário cheio;
+prestígio, ranking, scoreboard e TAB;
+/premium sem trancar jogadores piratas para fora;
+o próprio INICIAR.bat.
+O que eu não consegui fazer foi abrir o jogo com um cliente real. Os bots confirmaram os textos e o funcionamento, mas a aparência dos hologramas e menus na tela você vai ver na primeira vez que entrar.
+
+Problemas que achei e corrigi
+O 26.3 vem com a lista de permissões ligada por padrão (white-list=true), o que impediria qualquer pessoa de entrar. Desliguei.
+A janela de login antes de entrar no jogo, do AuthMe, podia travar clientes de versões antigas. Desliguei essa etapa e mantive a janela dentro do jogo e os comandos no chat.
+O atalho /dinheiro não funcionava. Corrigi.
+Avisos que aparecem no console e podem ser ignorados
+“unsupported server version” do EssentialsX: ele ainda não marcou o 26.3 como oficial, mas economia, homes, tpa e mensagens funcionaram nos testes.
+Erros com “oshi” ou “Perflib”: vêm dos contadores de desempenho do Windows deste PC, não do servidor.
+Cache de perfis do WorldGuard: ele passa a usar a memória e tudo continua funcionando.
+O WorldEdit está numa versão beta, a única que suporta o 26.3, mas só a staff usa.
+
+Os dados dos bots de teste foram apagados, e o código do plugin está em codigo-fonte, caso você queira mexer nele.
+
+Se quiser guardar este trabalho, posso mover esta sessão para uma pasta que você escolher.
+
+Editou 45 arquivos
+
+Texto.java
++136
+−0
+
+Numeros.java
++87
+−0
+
+Itens.java
++45
+−0
+
+Ver tudo
++5840
+−28
+me manda o arquivo pois eu n consigo achar para baixar
+
+Zip the server folder
+Servidor completo (333 MB). Extraia o zip e dê dois cliques em INICIAR.bat.
+
+
+ZIP
+ServidorRankup.zip
+ServidorRankup
+.zip
+349 MB
+Coloquei o servidor inteiro num arquivo ServidorRankup.zip (333 MB) e mandei aqui na conversa. Ele aparece como um cartão de arquivo logo acima desta mensagem; é só clicar para baixar.
+
+Para usar:
+
+Clique com o botão direito no zip e escolha Extrair tudo....
+Abra a pasta ServidorRankup que foi extraída.
+Dê dois cliques em INICIAR.bat.
+Não rode o servidor de dentro do zip sem extrair, porque ele não funciona assim.
+
+Se o download não aparecer ou falhar por causa do tamanho, posso também mover a pasta direto para a sua Área de Trabalho. É só me pedir.
+
+MUITO BOM AGORA FAÇA ESSAS COISAS
+1.CRIEI UM SITE BASICO HTML CSS EXPLICANDO TUDO SOBRE O SERVER! TANTO PARA ADM,DONO... TANTO PARA USERS PARADROES,
+COLOQUE TODOS OS CODIGOS  QUE TEM NO SERVIDOR E TC...
+2.CRIEI UM PLUGIN OU PROCURE UM ANTES PARA EU ME DEIXAR FODA TLG? EU DITIO EX "/MENUOP" PARA ABRIR UM MENO PARA EU SETAR DINHEIRO , A PICARATE MAIS OP E ETC...
+
+SE ISSO JA TIVER NO SERVER OK, MAS ACHO QUE NAO TEM, COLOQUE NO SERVER ,UM OUTRO MUNDO SOQ DE SURVIVVEL AGR, UM SURVIVEL NORMAL POREM COM PLUGINS MASSAS PARA SURVIEL IGUAL TEM AI EM VARIOS, ENTENDEU? QUAL QUER DUVIDE ME CHAME
+Entendi tudo! Vou fazer as três coisas:
+
+Site em HTML/CSS com todos os comandos, separado por jogador, staff e dono.
+/menuop: vou criar dentro do meu plugin, porque um plugin pronto não conheceria a Picareta Suprema, os ranks nem as minas.
+Mundo Sobrevivência com plugins bons de survival e inventário separado do rankup.
+Começo vendo quais plugins de survival já suportam o Paper 26.3:
+
+Checked survival plugins support for Paper 26.3
+Quase tudo tem versão para 26.3. Vejo os detalhes do Multiverse (o Core aparece só como beta) e as traduções disponíveis:
+
+Listed Multiverse versions and supported MC versions
+Confirmei que todos os plugins de survival desejados (Multiverse, GriefPrevention, AuraSkills, QuickShop, GSit, AxGraves, VeinMiner e Chunky) têm versão compatível com 26.3. Vou baixá-los com checagem de hash e verificar quais já têm tradução em português.
+
+Executou 2 comandos
+AuraSkills, QuickShop, GSit e Chunky já têm suporte nativo em português; já o GriefPrevention, AxGraves e VeinMiner são só em inglês, então vou traduzir as mensagens deles. Enquanto baixo de novo as ferramentas de compilação/teste, já vou começando a escrever o novo código.
+
+Re-downloaded build JDK and tested bot tooling
+Enquanto baixa, recrio a ferramenta de RCON para os testes:
+
+Criou Rcon.java, finalizou 1 comando em segundo plano
+Ferramentas prontas. Agora ligo o servidor uma vez com os plugins novos para gerar as configs deles e descobrir a sintaxe exata dos comandos do Multiverse 5 (religo o RCON só para os testes):
+
+Sim, o servidor está pronto. Está desligado agora, então não liguei ele. É só abrir o INICIAR.bat.
+
+Testei tudo numa cópia do seu mundo de verdade, com bots. As 10 baterias de teste passaram, sem erros no console.
+
+O que acontece sozinho na primeira vez que ligar:
+
+Capital Vila Aurora construída em volta do spawn do survival, em uns 2 segundos. Tem muralha redonda com 3 portões e torres, praça com chafariz, castelo, ruas com postes e 14 casas de vila (taverna, forja, templo, biblioteca), além de fazenda, jardim, campo de treino e o Portão das Masmorras.
+3 masmorras (2 cópias de cada) construídas longe de tudo, no alto.
+~24 lugares prontos espalhados pelo mapa: vilas, tavernas, torres, ruínas, criptas, castelos e acampamentos. Ficam sempre longe das bases, camas e terrenos dos jogadores.
+Leva uns 3 minutos e dá algumas travadas de até ~3 s cada (só nessa primeira vez).
+Se possível, ligue com pouca gente online.
+No teste entraram 23 de 24: uma vila não achou lugar bom, o que é normal.
+Antes de cada construção o plugin guarda uma foto do terreno. Se não gostar, /rpgadmin desfazer capital volta tudo como era.
+
+O que os jogadores encontram:
+
+Lobby: todo mundo chega numa ilha flutuante com um farol. O portal dourado leva ao Rankup e o verde ao SMP RPG, de volta exatamente onde a pessoa parou. A bússola abre o menu e /lobby volta para lá.
+SMP RPG:
+5 classes, níveis de 1 a 50 e pontos em /atributos.
+Habilidades: F + 1/2/3 com a arma da classe.
+Monstros com nível: mais fortes quanto mais longe do spawn, com elites e campeões.
+Itens raros e grupo (/grupo).
+/lugares mostra a direção e faz viagem rápida entre cidades.
+Masmorras: o grupo entra, os portões fecham em cada sala, vêm ondas de monstros e o chefe tem barra de vida e golpes especiais. Quem morre lá dentro não perde itens. Vencer dá XP, dinheiro e 2 itens raros.
+NPCs vivos: andam, patrulham, cumprimentam quem passa e conversam entre si. Também entraram guardas nos portões, o guardião das masmorras, um instrutor, um taverneiro e um morador em cada vila e taverna nova.
+Mudanças que você precisa saber:
+
+O comando das habilidades de classe é /poderes, porque /habilidades já é do AuraSkills.
+Desliguei a mensagem de XP do AuraSkills na barra de ação, para não piscar junto com a barra de vida/mana do RPG. A barra de chefe dele continua.
+O PvP continua igual a antes (ligado), menos dentro das cidades.
+Criei um grupo de inventário “lobby” no Multiverse-Inventories, então o lobby tem inventário próprio.
+Os testes antigos acharam dois problemas que já corrigi:
+O golpe de varredura da espada acertava os NPCs que andam e deixava os guardas bravos.
+O lobby deixava a mão do jogador presa no slot da bússola.
+Os plugins já estão no lugar: NpcVivos 0.9.0 e RankupSupremo 1.3.0 em plugins/update, e o SurvivalRPG direto em plugins. Atualizei o LEIA-ME.txt (seções 8.2 SMP RPG e 8.3 Lobby) e o site: 
+RankUP Supremo
